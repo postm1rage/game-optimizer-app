@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Electron builder cache
+.electron-builder/
+
+# Temporary files
+tmp/
+temp/
+
+# LLM models (if they are large and not in repo)
+llm/models/*.gguf
+llm/llama.cpp/
+
+# Optional: if you have user data
+user-data/
