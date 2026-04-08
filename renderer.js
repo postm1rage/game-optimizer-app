@@ -2,9 +2,10 @@ const outputDiv = document.getElementById('output');
 const testContainer = document.getElementById('testContainer');
 const describeBtn = document.getElementById('describeBtn');
 const testBtn = document.getElementById('testBtn');
+const mainMenu = document.querySelector('.buttons');
 
 let questions = null;
-let methodsList = null; // Список всех 20 методов
+let methodsList = null;
 
 // Загружаем методы при старте
 (async function loadMethods() {
@@ -13,21 +14,33 @@ let methodsList = null; // Список всех 20 методов
     console.log('Загружено методов:', methodsList.length);
 })();
 
-// Показать форму описания проблемы
+// Показать страницу описания проблемы (скрываем меню и тест)
 describeBtn.addEventListener('click', () => {
+    mainMenu.style.display = 'none';
     testContainer.classList.add('hidden');
     outputDiv.classList.remove('hidden');
+    
     outputDiv.innerHTML = `
-        <h3>📝 Опишите вашу проблему</h3>
+        <div class="page-header">
+            <button class="back-to-menu-btn">← Назад</button>
+            <h2>📝 Описать проблему</h2>
+        </div>
         <textarea id="problemText" rows="5" placeholder="Примеры описания:
 - У меня падает FPS в городе с кучей зданий
 - Лаги в мультиплеере при стрельбе
 - Игра долго загружается
 - Текстуры подгружаются медленно"></textarea>
-        <button id="submitProblem">🔍 Получить рекомендацию</button>
+        <button id="submitProblem" class="submit-llm-btn">🔍 Получить рекомендацию</button>
         <div id="result" class="result-area"></div>
     `;
     
+    // Обработчик кнопки "Назад"
+    document.querySelector('.back-to-menu-btn').addEventListener('click', () => {
+        outputDiv.classList.add('hidden');
+        mainMenu.style.display = 'flex';
+    });
+    
+    // Обработчик получения рекомендации
     document.getElementById('submitProblem').addEventListener('click', async () => {
         const problem = document.getElementById('problemText').value;
         if (!problem.trim()) {
@@ -40,29 +53,17 @@ describeBtn.addEventListener('click', () => {
         resultDiv.classList.add('loading');
         
         // Заглушка LLM (пока случайный метод из 20)
-        // Позже заменить на реальный вызов через window.electronAPI.askLLM
         setTimeout(() => {
-            // Имитация ответа LLM - выбираем случайный метод из списка
             const randomMethod = methodsList[Math.floor(Math.random() * methodsList.length)];
             displayMethodResult(randomMethod, resultDiv);
             resultDiv.classList.remove('loading');
         }, 1500);
-        
-        /* РЕАЛЬНАЯ LLM (раскомментировать когда будет готова)
-        const methodName = await window.electronAPI.askLLM(problem);
-        const foundMethod = methodsList.find(m => m.name === methodName);
-        if (foundMethod) {
-            displayMethodResult(foundMethod, resultDiv);
-        } else {
-            resultDiv.innerHTML = `❌ Не удалось определить метод. Попробуйте пройти тест.`;
-        }
-        resultDiv.classList.remove('loading');
-        */
     });
 });
 
-// Загрузить вопросы и показать тест
+// Показать страницу теста
 testBtn.addEventListener('click', async () => {
+    mainMenu.style.display = 'none';
     outputDiv.classList.add('hidden');
     testContainer.classList.remove('hidden');
     
@@ -78,8 +79,13 @@ testBtn.addEventListener('click', async () => {
 });
 
 function renderTest() {
-    let html = '<h2>📋 Ответьте на 10 вопросов</h2>';
-    html += '<div class="questions-container">';
+    let html = `
+        <div class="page-header">
+            <button class="back-to-menu-btn">← Назад</button>
+            <h2>📋 Пройти тест</h2>
+        </div>
+        <div class="questions-container">
+    `;
     
     questions.forEach((q, idx) => {
         html += `
@@ -100,20 +106,29 @@ function renderTest() {
         html += `</div></div>`;
     });
     
-    html += `<button id="submitTest" class="submit-btn">🎯 Узнать результат</button></div>`;
+    html += `
+        </div>
+        <button id="submitTest" class="submit-test-btn">🎯 Узнать результат</button>
+    `;
+    
     testContainer.innerHTML = html;
     
+    // Обработчик кнопки "Назад"
+    document.querySelector('.back-to-menu-btn').addEventListener('click', () => {
+        testContainer.classList.add('hidden');
+        mainMenu.style.display = 'flex';
+    });
+    
+    // Обработчик отправки теста
     document.getElementById('submitTest').addEventListener('click', computeResult);
 }
 
 function computeResult() {
-    // Инициализируем счётчики для всех 20 методов
     const scores = {};
     methodsList.forEach(method => {
         scores[method.name] = 0;
     });
     
-    // Проходим по всем вопросам
     let answeredCount = 0;
     questions.forEach((q, idx) => {
         const selected = document.querySelector(`input[name="q${idx}"]:checked`);
@@ -133,7 +148,6 @@ function computeResult() {
         return;
     }
     
-    // Находим метод с максимальным баллом
     let bestMethodName = null;
     let bestScore = -1;
     for (const [methodName, score] of Object.entries(scores)) {
@@ -143,29 +157,28 @@ function computeResult() {
         }
     }
     
-    // Находим полную информацию о методе
     const bestMethod = methodsList.find(m => m.name === bestMethodName);
-    
-    // Показываем результат с красивым оформлением
     showTestResult(bestMethod, scores);
 }
 
 function showTestResult(method, allScores) {
-    // Сортируем методы по убыванию баллов для топа
     const sorted = Object.entries(allScores)
         .map(([name, score]) => ({ name, score }))
         .sort((a, b) => b.score - a.score)
-        .slice(0, 5); // Топ-5
+        .slice(0, 5);
     
     let html = `
+        <div class="page-header">
+            <button class="back-to-menu-btn">← Назад</button>
+            <h2>📊 Результат теста</h2>
+        </div>
         <div class="result-card">
-            <h3>🎉 Рекомендуемый метод оптимизации</h3>
             <div class="main-method">
                 <span class="method-name">${method.name}</span>
                 <span class="method-category">${method.category}</span>
                 <p class="method-description">${method.description}</p>
             </div>
-            <h4>📊 Топ-5 методов по результатам теста:</h4>
+            <h4>📈 Топ-5 методов:</h4>
             <div class="top-methods">
     `;
     
@@ -186,48 +199,39 @@ function showTestResult(method, allScores) {
     
     html += `
             </div>
-            <button id="restartTest" class="restart-btn">🔄 Пройти тест заново</button>
-            <button id="backToMenu" class="back-btn">🏠 Вернуться в меню</button>
+            <button id="restartTest" class="restart-test-btn">🔄 Пройти тест заново</button>
         </div>
     `;
     
     testContainer.innerHTML = html;
     
-    document.getElementById('restartTest').addEventListener('click', () => {
-        renderTest();
+    document.querySelector('.back-to-menu-btn').addEventListener('click', () => {
+        testContainer.classList.add('hidden');
+        mainMenu.style.display = 'flex';
     });
     
-    document.getElementById('backToMenu').addEventListener('click', () => {
-        testContainer.classList.add('hidden');
-        outputDiv.classList.add('hidden');
-        document.querySelector('.buttons').style.display = 'flex';
+    document.getElementById('restartTest').addEventListener('click', () => {
+        renderTest();
     });
 }
 
 function displayMethodResult(method, resultDiv) {
     resultDiv.innerHTML = `
-        <div class="result-card success">
-            <h3>✅ Рекомендуемый метод оптимизации</h3>
+        <div class="result-card">
             <div class="main-method">
                 <span class="method-name">${method.name}</span>
                 <span class="method-category">${method.category}</span>
                 <p class="method-description">${method.description}</p>
             </div>
-            <button id="backFromResult" class="back-btn">🏠 Вернуться в меню</button>
+            <button id="newProblemBtn" class="new-problem-btn">✏️ Описать другую проблему</button>
         </div>
     `;
     
-    document.getElementById('backFromResult')?.addEventListener('click', () => {
-        outputDiv.classList.add('hidden');
-        document.querySelector('.buttons').style.display = 'flex';
+    document.getElementById('newProblemBtn')?.addEventListener('click', () => {
+        // Очищаем и показываем форму заново
+        const problemText = document.getElementById('problemText');
+        if (problemText) problemText.value = '';
+        const resultDiv2 = document.getElementById('result');
+        if (resultDiv2) resultDiv2.innerHTML = '';
     });
 }
-
-// Скрываем кнопки при открытии теста или описания
-describeBtn.addEventListener('click', () => {
-    document.querySelector('.buttons').style.display = 'none';
-});
-
-testBtn.addEventListener('click', () => {
-    document.querySelector('.buttons').style.display = 'none';
-});

@@ -1,54 +1,338 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #1e1e2f;
-  color: #fff;
-  margin: 0;
-  padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #eee;
 }
+
 .container {
-  max-width: 600px;
-  margin: 0 auto;
-  background: #2d2d3a;
-  padding: 20px;
-  border-radius: 12px;
+    max-width: 900px;
+    margin: 0 auto;
+    background: rgba(30, 30, 46, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Кнопки главного меню */
 .buttons {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 30px 0 20px;
 }
-button {
-  background: #4c9aff;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 8px;
-  cursor: pointer;
+
+.buttons button {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border: none;
+    padding: 14px 28px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
 }
-button:hover {
-  background: #3a7fcc;
+
+.buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.5);
 }
-.hidden {
-  display: none;
+
+/* Шапка страницы с кнопкой назад */
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
 }
-.output, .test {
-  margin-top: 20px;
+
+.back-to-menu-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
+
+.back-to-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-2px);
+}
+
+/* Кнопка получения рекомендации (LLM) */
+.submit-llm-btn {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 50px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.submit-llm-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+}
+
+/* Кнопка отправки теста */
+.submit-test-btn {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+    border: none;
+    padding: 14px 28px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #1a1a2e;
+    border-radius: 50px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    transition: transform 0.2s;
+}
+
+.submit-test-btn:hover {
+    transform: scale(1.02);
+}
+
+/* Кнопка "Пройти тест заново" */
+.restart-test-btn {
+    background: rgba(67, 233, 123, 0.3);
+    border: 1px solid #43e97b;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #43e97b;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 20px;
+}
+
+.restart-test-btn:hover {
+    background: rgba(67, 233, 123, 0.5);
+}
+
+/* Кнопка "Описать другую проблему" */
+.new-problem-btn {
+    background: rgba(79, 172, 254, 0.3);
+    border: 1px solid #4facfe;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #4facfe;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 20px;
+}
+
+.new-problem-btn:hover {
+    background: rgba(79, 172, 254, 0.5);
+}
+
+/* Карточки вопросов */
+.questions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.question-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.question-text {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.option-label:hover {
+    background: rgba(79, 172, 254, 0.2);
+}
+
+.option-label input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #4facfe;
+}
+
+/* Текстовое поле */
 textarea {
-  width: 100%;
-  padding: 8px;
-  border-radius: 8px;
-  border: none;
-  margin-bottom: 10px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 15px;
 }
-.question {
-  margin-bottom: 15px;
-  background: #3a3a4a;
-  padding: 10px;
-  border-radius: 8px;
+
+textarea:focus {
+    outline: none;
+    border-color: #4facfe;
 }
-label {
-  display: block;
-  margin: 5px 0;
+
+/* Результат */
+.result-card {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.1));
+    border-radius: 20px;
+    padding: 25px;
+    margin-top: 20px;
+    border: 1px solid rgba(79, 172, 254, 0.5);
+}
+
+.main-method {
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    margin: 20px 0;
+}
+
+.method-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: #4facfe;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.method-category {
+    display: inline-block;
+    background: rgba(79, 172, 254, 0.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.method-description {
+    font-size: 16px;
+    color: #ccc;
+    line-height: 1.5;
+}
+
+/* Топ-5 методов */
+.top-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.top-method-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.top-method-rank {
+    font-size: 20px;
+    font-weight: bold;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border-radius: 50%;
+    color: #fff;
+}
+
+.top-method-info {
+    flex: 1;
+}
+
+.top-method-info strong {
+    display: block;
+    font-size: 16px;
+}
+
+.top-method-category {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.top-method-score {
+    font-size: 14px;
+    color: #4facfe;
+    font-weight: bold;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #4facfe;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .method-name {
+        font-size: 22px;
+    }
+    
+    .top-method-item {
+        flex-wrap: wrap;
+    }
 }
