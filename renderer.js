@@ -14,7 +14,7 @@ let methodsList = null;
     console.log('Загружено методов:', methodsList.length);
 })();
 
-// Показать страницу описания проблемы (скрываем меню и тест)
+// Показать страницу описания проблемы
 describeBtn.addEventListener('click', () => {
     mainMenu.style.display = 'none';
     testContainer.classList.add('hidden');
@@ -49,15 +49,54 @@ describeBtn.addEventListener('click', () => {
         }
         
         const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = '🔄 Анализируем проблему...';
+        resultDiv.innerHTML = '🔄 Анализируем проблему через LLM...';
         resultDiv.classList.add('loading');
         
-        // Заглушка LLM (пока случайный метод из 20)
-        setTimeout(() => {
-            const randomMethod = methodsList[Math.floor(Math.random() * methodsList.length)];
-            displayMethodResult(randomMethod, resultDiv);
-            resultDiv.classList.remove('loading');
-        }, 1500);
+        try {
+            // Реальный вызов OpenRouter через main process
+            const methodName = await window.electronAPI.askLLM(problem);
+            const foundMethod = methodsList.find(m => m.name === methodName);
+            
+            if (foundMethod) {
+                displayMethodResult(foundMethod, resultDiv);
+            } else {
+                // Если метод не найден, пробуем поискать по частичному совпадению
+                const partialMatch = methodsList.find(m => 
+                    methodName.toLowerCase().includes(m.name.toLowerCase()) ||
+                    m.name.toLowerCase().includes(methodName.toLowerCase())
+                );
+                
+                if (partialMatch) {
+                    displayMethodResult(partialMatch, resultDiv);
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result-card">
+                            <p>❌ Не удалось определить метод. Попробуйте пройти тест.</p>
+                            <p><small>Ответ LLM: "${methodName}"</small></p>
+                            <button id="backFromError" class="back-btn">🏠 Вернуться в меню</button>
+                        </div>
+                    `;
+                    document.getElementById('backFromError')?.addEventListener('click', () => {
+                        outputDiv.classList.add('hidden');
+                        mainMenu.style.display = 'flex';
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('LLM error:', error);
+            resultDiv.innerHTML = `
+                <div class="result-card">
+                    <p>❌ Ошибка при обращении к LLM. Проверьте интернет и API ключ.</p>
+                    <button id="backFromError" class="back-btn">🏠 Вернуться в меню</button>
+                </div>
+            `;
+            document.getElementById('backFromError')?.addEventListener('click', () => {
+                outputDiv.classList.add('hidden');
+                mainMenu.style.display = 'flex';
+            });
+        }
+        
+        resultDiv.classList.remove('loading');
     });
 });
 
@@ -94,7 +133,7 @@ function renderTest() {
                 <div class="options-group">
         `;
         
-        q.options.forEach((opt, optIdx) => {
+        q.options.forEach((opt) => {
             html += `
                 <label class="option-label">
                     <input type="radio" name="q${idx}" value="${opt.text}" data-weights='${JSON.stringify(opt.weights)}'>
@@ -113,13 +152,11 @@ function renderTest() {
     
     testContainer.innerHTML = html;
     
-    // Обработчик кнопки "Назад"
     document.querySelector('.back-to-menu-btn').addEventListener('click', () => {
         testContainer.classList.add('hidden');
         mainMenu.style.display = 'flex';
     });
     
-    // Обработчик отправки теста
     document.getElementById('submitTest').addEventListener('click', computeResult);
 }
 
@@ -224,14 +261,19 @@ function displayMethodResult(method, resultDiv) {
                 <p class="method-description">${method.description}</p>
             </div>
             <button id="newProblemBtn" class="new-problem-btn">✏️ Описать другую проблему</button>
+            <button id="backToMenuBtn" class="back-btn">🏠 Вернуться в меню</button>
         </div>
     `;
     
     document.getElementById('newProblemBtn')?.addEventListener('click', () => {
-        // Очищаем и показываем форму заново
         const problemText = document.getElementById('problemText');
         if (problemText) problemText.value = '';
         const resultDiv2 = document.getElementById('result');
         if (resultDiv2) resultDiv2.innerHTML = '';
+    });
+    
+    document.getElementById('backToMenuBtn')?.addEventListener('click', () => {
+        outputDiv.classList.add('hidden');
+        mainMenu.style.display = 'flex';
     });
 }
