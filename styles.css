@@ -67,20 +67,60 @@ h1 {
     margin-bottom: 25px;
 }
 
-.back-to-menu-btn {
+/* Кнопки возврата и навигации */
+.back-btn, .back-to-menu-btn {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-size: 14px;
     color: #fff;
     border-radius: 30px;
     cursor: pointer;
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.back-to-menu-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateX(-2px);
+.back-btn:hover, .back-to-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(-3px);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.back-btn:active, .back-to-menu-btn:active {
+    transform: translateX(0);
+}
+
+/* Отдельно для кнопки "Вернуться в меню" в результатах */
+.result-card .back-btn {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border: none;
+    color: #fff;
+    margin-top: 15px;
+}
+
+.result-card .back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+}
+
+/* Кнопка "Описать другую проблему" */
+.new-problem-btn {
+    background: rgba(79, 172, 254, 0.3);
+    border: 1px solid #4facfe;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #4facfe;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 10px;
+}
+
+.new-problem-btn:hover {
+    background: rgba(79, 172, 254, 0.5);
+    transform: translateY(-2px);
 }
 
 /* Кнопка получения рекомендации (LLM) */
